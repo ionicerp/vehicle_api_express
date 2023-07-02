@@ -13,4 +13,4 @@ COPY --from=build /usr/src/app/dist ./dist
 COPY package*.json ./
 RUN npm install --only=production
 RUN ls -la ./dist
-CMD [ "node", "dist/index.js" ]
+CMD [ "node", "dist/app.js" ]
