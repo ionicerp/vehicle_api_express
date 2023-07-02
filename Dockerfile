@@ -7,7 +7,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2
-FROM nginx:stable-alpine3.17
+FROM node:18.16.1-alpine
 WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/dist ./dist
 COPY package*.json ./
