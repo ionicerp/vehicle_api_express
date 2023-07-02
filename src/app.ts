@@ -8,6 +8,10 @@ app.get('/', (req, res) => {
     res.send('Hello Kubernetes!');
 });
 
+app.get('/vehicle', (req, res) => {
+    res.send('Hello Kubernetes of Vehicle route?!');
+});
+
 app.listen(8080, () => {
     console.log('Server is running on port 8080');
 });
