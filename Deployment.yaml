@@ -18,6 +18,12 @@ spec:
         # imagePullPolicy: Always
         ports:
         - containerPort: 8080
+        env:
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: jwt-secret
+              key: SECRET_KEY
       imagePullSecrets:
       - name: my-github-secret
       # - name: my-regcred
