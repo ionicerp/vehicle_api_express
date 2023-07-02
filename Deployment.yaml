@@ -17,7 +17,7 @@ spec:
         image: ghcr.io/ionicerp/vehicle_api_express:latest
         # imagePullPolicy: Always
         ports:
-        - containerPort: 80
+        - containerPort: 8080
       imagePullSecrets:
       - name: my-github-secret
       # - name: my-regcred
@@ -32,5 +32,5 @@ spec:
   ports:
   - protocol: TCP
     port: 80
-    targetPort: 80
+    targetPort: 8080
   # type: LoadBalancer
