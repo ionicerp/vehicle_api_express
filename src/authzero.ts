@@ -24,7 +24,7 @@ export const checkJwt = expressjwt({
         jwksRequestsPerMinute: 5,
         jwksUri: `https://ionicerp.us.auth0.com/.well-known/jwks.json`,
     }) as any,
-    audience: 'tYk0jDwd29OG9V8BmZJl3FoXaRr5y8GO',
+    audience: 'https://ionicerp.us.auth0.com/api/v2/',
     issuer: `https://ionicerp.us.auth0.com/`,
     algorithms: ['RS256'],
 });
