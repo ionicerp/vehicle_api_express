@@ -1,8 +1,5 @@
-import jwtDefault from 'express-jwt';
-import jwksRsa from 'jwks-rsa';
-
-// Get callable function
-const jwt = jwtDefault as any;
+const jwt = require('express-jwt');
+const jwksRsa = require('jwks-rsa');
 
 export const checkJwt = jwt({
     secret: jwksRsa.expressJwtSecret({
