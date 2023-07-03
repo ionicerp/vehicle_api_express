@@ -18,3 +18,9 @@ app.use('/vehicle/v1', routes);
 app.listen(8080, () => {
     console.log('Server is running on port 8080');
 });
+
+// steps 01
+// says VEHICLE FE is connecting to this API, the FE need to provide a username & password for exchange a JWT token
+
+// steps 02
+// says VEHICLE FE is consuming the list payload, the FE need to provide with the JWT token, we will then make sure it's validity
