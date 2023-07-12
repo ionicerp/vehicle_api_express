@@ -2,6 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import routes from './routes';
 import rateLimit from 'express-rate-limit';
+import cors from 'cors';
 
 const app = express();
 app.use(bodyParser.json());
@@ -12,6 +13,11 @@ const limiter = rateLimit({
 });
 
 app.use(limiter);
+
+app.use(cors({
+    origin: 'https://app.ionicerp.com',
+    credentials: true,
+}));
 
 app.use('/vehicle/v1', routes);
 
