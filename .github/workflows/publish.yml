@@ -28,7 +28,7 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-              docker build . --tag ghcr.io/ionicerp/vehicle_api_express:latest
+              docker build --no-cache -t ghcr.io/ionicerp/vehicle_api_express:latest .
               docker push ghcr.io/ionicerp/vehicle_api_express:latest
 
       - name: Set up kubeconfig
