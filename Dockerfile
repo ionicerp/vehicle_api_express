@@ -6,6 +6,7 @@ WORKDIR /usr/src/app
 COPY . .
 # RUN npx prisma generate
 RUN npm install
+RUN npx prisma generate
 RUN npm run build
 
 # Stage 2
