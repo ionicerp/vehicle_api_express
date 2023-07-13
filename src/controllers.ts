@@ -34,7 +34,16 @@ export const get = async (req: Request, res: Response) => {
 export const privateCheck = async (req: Request, res: Response) => {
     try {
         res.status(200).json({
-            message: "Hello from a private endpoint! You need to be authenticated to see this.",
+            message: "Hello from a private endpoint! You need to be authenticated to see this."
+        });
+    } catch (error) {
+        res.status(500).json({ error: (error as Error).message });
+    }
+}
+
+export const getSampleEnvValue = async (req: Request, res: Response) => {
+    try {
+        res.status(200).json({
             sample_value: process.env.SAMPLE_VALUE
         });
     } catch (error) {
