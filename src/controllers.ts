@@ -1,5 +1,8 @@
 import { Request, Response } from 'express';
 import * as jwt from 'jsonwebtoken';
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 const secretKey = process.env.SECRET_KEY;
 const loginUser = process.env.LOGIN_USER;
@@ -33,6 +36,29 @@ export const privateCheck = async (req: Request, res: Response) => {
         res.status(200).json({
             message: "Hello from a private endpoint! You need to be authenticated to see this."
         });
+    } catch (error) {
+        res.status(500).json({ error: (error as Error).message });
+    }
+}
+
+export const createVehicle = async (req: Request, res: Response) => {
+    try {
+        const { registrationNumber } = req.body;
+        const result = await prisma.vehicle.create({
+            data: {
+                registration_number: registrationNumber,
+            }
+        });
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({ error: (error as Error).message });
+    }
+}
+
+export const getVehicle = async (req: Request, res: Response) => {
+    try {
+        const result = await prisma.vehicle.findMany();
+        res.status(200).json(result);
     } catch (error) {
         res.status(500).json({ error: (error as Error).message });
     }
