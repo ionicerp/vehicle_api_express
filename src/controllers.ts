@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client'
+import jwtDecode from 'jwt-decode';
 
 const prisma = new PrismaClient()
 
@@ -66,9 +67,17 @@ export const createVehicle = async (req: Request, res: Response) => {
 }
 
 export const getVehicle = async (req: Request, res: Response) => {
+    const token = req.headers.authorization?.split(' ')[1]; // Assuming the token is sent in the "Authorization" header as "Bearer <token>"
     try {
+
+        if (!token) {
+            throw new Error('No token provided');
+        }
+        const jwtDecodeToken: any = jwtDecode(token);
+        const companyIds = jwtDecodeToken['https://app.ionicerp.com/app_metadata'];
+
         const result = await prisma.vehicle.findMany();
-        res.status(200).json(result);
+        res.status(200).json({ result: result, companyIds: companyIds });
     } catch (error) {
         res.status(500).json({ error: (error as Error).message });
     }
