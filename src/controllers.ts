@@ -73,8 +73,8 @@ export const getVehicle = async (req: Request, res: Response) => {
         if (!token) {
             throw new Error('No token provided');
         }
-        const jwtDecodeToken: any = jwtDecode(token);
-        const companyIds = jwtDecodeToken['https://app.ionicerp.com/app_metadata'];
+        const jwtDecodedToken: any = jwtDecode(token);
+        const companyIds = jwtDecodedToken['https://app.ionicerp.com/app_metadata'];
 
         const result = await prisma.vehicle.findMany();
         res.status(200).json({ result: result, companyIds: companyIds });
