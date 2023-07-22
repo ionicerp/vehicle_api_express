@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import routes from './routes';
 import rateLimit from 'express-rate-limit';
@@ -20,6 +20,20 @@ app.use(cors({
 }));
 
 app.use('/vehicle/v1', routes);
+
+// Custom error handling middleware
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    // Check if the error is an UnauthorizedError
+    if (err.name === 'UnauthorizedError') {
+        // Send a simplified error response with just the error title
+        res.status(401).json({ error: 'Unauthorized' });
+    } else {
+        // For other types of errors, you may want to handle them differently
+        // You can customize the error responses as needed
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 
 app.listen(8080, () => {
     console.log('Server is running on port 8080');
