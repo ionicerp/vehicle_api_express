@@ -32,6 +32,23 @@ const sendErrorResponse = (res: Response, error: Error): void => {
     res.status(500).json({ error: error.message });
 };
 
+async function checkVehicleUniqueness(registrationNumber: string, organizationId: string, companyId: string): Promise<boolean> {
+    // Perform a query in your database to check for uniqueness
+    // Return true if the registration number is unique, false otherwise
+    // Example pseudocode:
+    // const existingVehicle = queryDatabaseForVehicle(registrationNumber);
+    // return !existingVehicle;
+    const vehicle = await prisma.vehicle.findFirst({
+        where: {
+            registration_number: registrationNumber,
+            organization_id: organizationId,
+            company_id: companyId
+        }
+    });
+    return vehicle === null; // For demonstration purposes, always return true
+}
+
+
 export const createVehicle = async (req: Request, res: Response) => {
     const token = req.headers.authorization?.split(' ')[1];
     const { companyId, organizationId, registrationNumber } = req.body;
@@ -41,6 +58,15 @@ export const createVehicle = async (req: Request, res: Response) => {
         const { 'https://app.ionicerp.com/app_metadata': companyData } = decodedToken;
 
         validateCompanyIds(companyData.companyIds, companyId);
+
+        if (!registrationNumber || !organizationId || !companyId) {
+            return res.status(400).json({ error: 'All fields are required.' });
+        }
+
+        const isUnique = checkVehicleUniqueness(registrationNumber, organizationId, companyId);
+        if (!isUnique) {
+            return res.status(409).json({ error: 'Vehicle is not unique.' });
+        }
 
         const data: any = {
             registration_number: registrationNumber,
