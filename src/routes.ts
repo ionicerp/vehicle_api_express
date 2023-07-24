@@ -1,7 +1,7 @@
 import express from 'express';
-import * as ctrl from './controllers';
+// import * as ctrl from './controllers';
 import * as vehicleController from './controller_vehicle';
-import { authenticate } from './common';
+// import { authenticate } from './common';
 import { checkJwt } from './authzero';
 
 const router = express.Router();
