@@ -63,7 +63,7 @@ export const createVehicle = async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'All fields are required.' });
         }
 
-        const isUnique = checkVehicleUniqueness(registrationNumber, organizationId, companyId);
+        const isUnique = await checkVehicleUniqueness(registrationNumber, organizationId, companyId);
         if (!isUnique) {
             return res.status(409).json({ error: 'Vehicle is not unique.' });
         }
