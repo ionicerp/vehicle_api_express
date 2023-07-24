@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
-import routes from './routes';
+import route_vehicle from './route_vehicle';
 import rateLimit from 'express-rate-limit';
 import cors from 'cors';
 
@@ -19,7 +19,7 @@ app.use(cors({
     credentials: true,
 }));
 
-app.use('/vehicles', routes);
+app.use('/vehicles', route_vehicle);
 
 // Custom error handling middleware
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
