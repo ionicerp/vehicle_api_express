@@ -32,20 +32,21 @@ const sendErrorResponse = (res: Response, error: Error): void => {
     res.status(500).json({ error: error.message });
 };
 
-async function checkVehicleUniqueness(registrationNumber: string, organizationId: string, companyId: string): Promise<boolean> {
-    // Perform a query in your database to check for uniqueness
-    // Return true if the registration number is unique, false otherwise
-    // Example pseudocode:
-    // const existingVehicle = queryDatabaseForVehicle(registrationNumber);
-    // return !existingVehicle;
+async function checkVehicleUniqueness(registrationNumber: string, companyId: string, organizationId?: string): Promise<boolean> {
+    let whereClause: any = {
+        registration_number: registrationNumber,
+        company_id: companyId,
+    };
+
+    if (organizationId) {
+        whereClause.organization_id = organizationId;
+    }
+
     const vehicle = await prisma.vehicle.findFirst({
-        where: {
-            registration_number: registrationNumber,
-            organization_id: organizationId,
-            company_id: companyId
-        }
+        where: whereClause,
     });
-    return vehicle === null; // For demonstration purposes, always return true
+
+    return vehicle === null;
 }
 
 
@@ -59,25 +60,22 @@ export const createVehicle = async (req: Request, res: Response) => {
 
         validateCompanyIds(companyData.companyIds, companyId);
 
-        if (!registrationNumber || !organizationId || !companyId) {
-            return res.status(400).json({ error: 'All fields are required.' });
+        if (!registrationNumber || !companyId) {
+            return res.status(400).json({ error: 'Registration number and company ID are required fields.' });
         }
 
-        const isUnique = await checkVehicleUniqueness(registrationNumber, organizationId, companyId);
-        if (!isUnique) {
-            return res.status(409).json({ error: 'Vehicle is not unique.' });
-        }
-
-        const data: any = {
+        let data: any = {
             registration_number: registrationNumber,
+            company_id: companyId,
         };
-
-        if (companyId) {
-            data.company_id = companyId;
-        }
 
         if (organizationId) {
             data.organization_id = organizationId;
+        }
+
+        const isUnique = await checkVehicleUniqueness(registrationNumber, companyId, organizationId);
+        if (!isUnique) {
+            return res.status(409).json({ error: 'Vehicle is not unique.' });
         }
 
         const result = await prisma.vehicle.create({
@@ -85,6 +83,7 @@ export const createVehicle = async (req: Request, res: Response) => {
         });
 
         res.status(200).json(result);
+
     } catch (error) {
         sendErrorResponse(res, error as Error);
     }
@@ -92,6 +91,7 @@ export const createVehicle = async (req: Request, res: Response) => {
 
 export const getAllVehicles = async (req: Request, res: Response) => {
     const token = req.headers.authorization?.split(' ')[1];
+    const organizationId = req.query.organizationId as string | undefined;
     const companyId = req.query.companyId as string;
 
     try {
@@ -100,13 +100,17 @@ export const getAllVehicles = async (req: Request, res: Response) => {
 
         validateCompanyIds(companyData.companyIds, companyId);
 
+        const where = {
+            company_id: companyId,
+            ...(organizationId && { organization_id: organizationId }), // Add the organizationId filter condition conditionally
+        };
+
         const result = await prisma.vehicle.findMany({
-            where: {
-                company_id: companyId,
-            },
+            where,
         });
 
         res.status(200).json(result);
+
     } catch (error) {
         sendErrorResponse(res, error as Error);
     }
@@ -115,6 +119,7 @@ export const getAllVehicles = async (req: Request, res: Response) => {
 export const getSingleVehicle = async (req: Request, res: Response) => {
     const token = req.headers.authorization?.split(' ')[1];
     const vehicleId = Number(req.params.id);
+    const organizationId = req.query.organizationId as string | undefined;
     const companyId = req.query.companyId as string;
 
     try {
@@ -123,11 +128,14 @@ export const getSingleVehicle = async (req: Request, res: Response) => {
 
         validateCompanyIds(companyData.companyIds, companyId);
 
+        const where = {
+            id: vehicleId,
+            company_id: companyId,
+            ...(organizationId && { organization_id: organizationId }), // Add the organizationId filter condition conditionally
+        };
+
         const result = await prisma.vehicle.findFirst({
-            where: {
-                id: vehicleId,
-                company_id: companyId,
-            },
+            where
         });
 
         res.status(200).json(result);
@@ -140,6 +148,7 @@ export const updateVehicle = async (req: Request, res: Response) => {
     const token = req.headers.authorization?.split(' ')[1];
     const vehicleId = Number(req.params.id);
     const companyId = req.query.companyId as string;
+    const organizationId = req.query.organizationId as string | undefined;
     const { registrationNumber } = req.body;
 
     try {
@@ -148,10 +157,15 @@ export const updateVehicle = async (req: Request, res: Response) => {
 
         validateCompanyIds(companyData.companyIds, companyId);
 
+        if (!registrationNumber || !companyId) {
+            return res.status(400).json({ error: 'Registration number and company ID are required fields.' });
+        }
+
         const updatedVehicle = await prisma.vehicle.update({
             where: {
                 id: vehicleId,
                 company_id: companyId,
+                ...(organizationId && { organization_id: organizationId }),
             },
             data: {
                 registration_number: registrationNumber,
@@ -168,6 +182,7 @@ export const deleteVehicle = async (req: Request, res: Response) => {
     const token = req.headers.authorization?.split(' ')[1];
     const vehicleId = Number(req.params.id);
     const companyId = req.query.companyId as string;
+    const organizationId = req.query.organizationId as string | undefined;
 
     try {
         const decodedToken = verifyToken(token);
@@ -179,6 +194,7 @@ export const deleteVehicle = async (req: Request, res: Response) => {
             where: {
                 id: vehicleId,
                 company_id: companyId,
+                ...(organizationId && { organization_id: organizationId }),
             },
         });
 
@@ -191,6 +207,7 @@ export const deleteVehicle = async (req: Request, res: Response) => {
 export const searchVehicles = async (req: Request, res: Response) => {
     const token = req.headers.authorization?.split(' ')[1];
     const companyId = req.query.companyId as string;
+    const organizationId = req.query.organizationId as string | undefined;
     const { make, model, year } = req.query;
 
     try {
@@ -201,6 +218,7 @@ export const searchVehicles = async (req: Request, res: Response) => {
 
         const searchConditions: {
             company_id: string;
+            organization_id?: string; // Make it optional
             make?: { contains: string };
             model?: { contains: string };
             year?: number;
@@ -208,6 +226,9 @@ export const searchVehicles = async (req: Request, res: Response) => {
             company_id: companyId,
         };
 
+        if (organizationId !== undefined) {
+            searchConditions.organization_id = organizationId;
+        }
         if (make !== undefined) {
             searchConditions.make = { contains: make as string };
         }
