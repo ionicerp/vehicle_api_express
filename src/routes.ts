@@ -20,19 +20,19 @@ const router = express.Router();
 // router.get('/search', checkJwt, vehicleController.searchVehicles);
 
 // Create a new vehicle
-router.post('/', checkJwt, vehicleController.createVehicle);
+router.post('/v1', checkJwt, vehicleController.createVehicle);
 
 // Get all vehicles or search vehicles based on query parameters
-router.get('/', checkJwt, vehicleController.getAllVehicles);
+router.get('/v1', checkJwt, vehicleController.getAllVehicles);
 
 // Get a single vehicle by ID
-router.get('/:id', checkJwt, vehicleController.getSingleVehicle);
+router.get('/v1/:id', checkJwt, vehicleController.getSingleVehicle);
 
 // Update a specific vehicle by ID
-router.put('/:id', checkJwt, vehicleController.updateVehicle);
+router.put('/v1/:id', checkJwt, vehicleController.updateVehicle);
 
 // Delete a specific vehicle by ID
-router.delete('/:id', checkJwt, vehicleController.deleteVehicle);
+router.delete('/v1/:id', checkJwt, vehicleController.deleteVehicle);
 
 // get    https://api.ionicerp.com/vehicle/v1/list
 // get    https://api.ionicerp.com/vehicle/v1/search
