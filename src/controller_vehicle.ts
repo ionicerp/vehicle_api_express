@@ -3,8 +3,12 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 import jwtDecode from 'jwt-decode';
 
+interface CompanyData {
+    companyIds: string[];
+}
+
 interface DecodedToken {
-    'https://app.ionicerp.com/app_metadata': string[];
+    'https://app.ionicerp.com/app_metadata': CompanyData;
 }
 
 const verifyToken = (token: string | undefined): DecodedToken => {
@@ -34,9 +38,9 @@ export const createVehicle = async (req: Request, res: Response) => {
 
     try {
         const decodedToken = verifyToken(token);
-        const { 'https://app.ionicerp.com/app_metadata': companyIds } = decodedToken;
+        const { 'https://app.ionicerp.com/app_metadata': companyData } = decodedToken;
 
-        validateCompanyIds(companyIds, companyId);
+        validateCompanyIds(companyData.companyIds, companyId);
 
         const data: any = {
             registration_number: registrationNumber,
@@ -66,9 +70,9 @@ export const getAllVehicles = async (req: Request, res: Response) => {
 
     try {
         const decodedToken = verifyToken(token);
-        const { 'https://app.ionicerp.com/app_metadata': companyIds } = decodedToken;
+        const { 'https://app.ionicerp.com/app_metadata': companyData } = decodedToken;
 
-        validateCompanyIds(companyIds, companyId);
+        validateCompanyIds(companyData.companyIds, companyId);
 
         const result = await prisma.vehicle.findMany({
             where: {
@@ -76,7 +80,7 @@ export const getAllVehicles = async (req: Request, res: Response) => {
             },
         });
 
-        res.status(200).json({ result, companyIds });
+        res.status(200).json(result);
     } catch (error) {
         sendErrorResponse(res, error as Error);
     }
@@ -89,9 +93,9 @@ export const getSingleVehicle = async (req: Request, res: Response) => {
 
     try {
         const decodedToken = verifyToken(token);
-        const { 'https://app.ionicerp.com/app_metadata': companyIds } = decodedToken;
+        const { 'https://app.ionicerp.com/app_metadata': companyData } = decodedToken;
 
-        validateCompanyIds(companyIds, companyId);
+        validateCompanyIds(companyData.companyIds, companyId);
 
         const result = await prisma.vehicle.findFirst({
             where: {
@@ -100,7 +104,7 @@ export const getSingleVehicle = async (req: Request, res: Response) => {
             },
         });
 
-        res.status(200).json({ result, companyIds });
+        res.status(200).json(result);
     } catch (error) {
         sendErrorResponse(res, error as Error);
     }
@@ -114,9 +118,9 @@ export const updateVehicle = async (req: Request, res: Response) => {
 
     try {
         const decodedToken = verifyToken(token);
-        const { 'https://app.ionicerp.com/app_metadata': companyIds } = decodedToken;
+        const { 'https://app.ionicerp.com/app_metadata': companyData } = decodedToken;
 
-        validateCompanyIds(companyIds, companyId);
+        validateCompanyIds(companyData.companyIds, companyId);
 
         const updatedVehicle = await prisma.vehicle.update({
             where: {
@@ -141,9 +145,9 @@ export const deleteVehicle = async (req: Request, res: Response) => {
 
     try {
         const decodedToken = verifyToken(token);
-        const { 'https://app.ionicerp.com/app_metadata': companyIds } = decodedToken;
+        const { 'https://app.ionicerp.com/app_metadata': companyData } = decodedToken;
 
-        validateCompanyIds(companyIds, companyId);
+        validateCompanyIds(companyData.companyIds, companyId);
 
         const deletedVehicle = await prisma.vehicle.delete({
             where: {
@@ -165,9 +169,9 @@ export const searchVehicles = async (req: Request, res: Response) => {
 
     try {
         const decodedToken = verifyToken(token);
-        const { 'https://app.ionicerp.com/app_metadata': companyIds } = decodedToken;
+        const { 'https://app.ionicerp.com/app_metadata': companyData } = decodedToken;
 
-        validateCompanyIds(companyIds, companyId);
+        validateCompanyIds(companyData.companyIds, companyId);
 
         const searchConditions: {
             company_id: string;
