@@ -17,7 +17,7 @@ const verifyToken = (token: string | undefined): DecodedToken => {
 
 const validateCompanyIds = (companyIds: string[], companyId: string): void => {
     if (!Array.isArray(companyIds)) {
-        throw new Error('companyIds should be an array. Currently the value:' + companyIds);
+        throw new Error('companyIds should be an array. Currently the value:' + JSON.stringify(companyIds));
     }
     if (!companyIds.includes(companyId)) {
         throw new Error('Illegal company id detected');
